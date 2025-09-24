@@ -8,6 +8,11 @@ const categorySchema = new mongoose.Schema({
     unique: true, // prevent duplicates
     trim: true,
   },
+  
+  image: {
+    type: String, // هتخزن اللينك أو اسم الملف
+    required: true,
+  },
 });
 
 const CategoryModel =

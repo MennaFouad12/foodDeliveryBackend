@@ -49,6 +49,7 @@
 
 import FoodModel from "../models/foodemodel.js";
 import cloudinary from "../config/cloudinary.js";
+import CategoryModel from "../models/categorymodel.js";
 
 // Helper: upload buffer to Cloudinary
 const uploadToCloudinary = (fileBuffer) => {
@@ -122,4 +123,31 @@ const removeFood = async (req, res) => {
   }
 };
 
-export { addFood, listFoods, removeFood };
+
+
+
+const getProductsByCategory = async (req, res) => {
+  try {
+    const { categoryName } = req.params;
+
+    // اتأكد الأول إن الكاتيجوري موجود
+    const category = await CategoryModel.findOne({ name: categoryName });
+    if (!category) {
+      return res.status(404).json({ success: false, message: "Category not found" });
+    }
+
+    // هات كل الأكل اللي تبع الكاتيجوري ده
+    const foods = await FoodModel.find({ category: categoryName });
+
+    res.status(200).json({
+      success: true,
+      count: foods.length,
+      category: categoryName,
+      foods,
+    });
+  } catch (error) {
+    console.error("Error fetching products by category:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+export { addFood, listFoods, removeFood,getProductsByCategory };

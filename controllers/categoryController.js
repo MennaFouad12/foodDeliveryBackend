@@ -1,7 +1,21 @@
 // controllers/categoryController.js
 
 import CategoryModel from "../models/categorymodel.js";
+import cloudinary from "../config/cloudinary.js";
 
+// Helper: upload buffer to Cloudinary
+const uploadToCloudinary = (fileBuffer) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "categories" }, // cloudinary folder
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+    stream.end(fileBuffer); // push the buffer into the upload stream
+  });
+};
 
 // ✅ Add Category
 export const addCategory = async (req, res) => {
@@ -13,12 +27,21 @@ export const addCategory = async (req, res) => {
     const exists = await CategoryModel.findOne({ name });
     if (exists) return res.status(400).json({ error: "Category already exists" });
 
-    const newCategory = new CategoryModel({ name });
-    await newCategory.save();
+    let imageUrl = null;
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer);
+      imageUrl = result.secure_url;
+    }
 
-    res.status(201).json({ success: true, category: newCategory });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const category = await CategoryModel.create({
+      name,
+      image: imageUrl,
+    });
+
+    res.status(201).json({ message: "Category added successfully", category });
+  } catch (error) {
+    console.error("Error adding category:", error);
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -28,17 +51,23 @@ export const updateCategory = async (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
 
-    const updatedCategory = await CategoryModel.findByIdAndUpdate(
-      id,
-      { name },
-      { new: true }
-    );
+    let updateData = { name };
+
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer);
+      updateData.image = result.secure_url;
+    }
+
+    const updatedCategory = await CategoryModel.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
 
     if (!updatedCategory) return res.status(404).json({ error: "Category not found" });
 
-    res.json({ success: true, category: updatedCategory });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.json({ message: "Category updated successfully", category: updatedCategory });
+  } catch (error) {
+    console.error("Error updating category:", error);
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -51,9 +80,10 @@ export const deleteCategory = async (req, res) => {
 
     if (!deleted) return res.status(404).json({ error: "Category not found" });
 
-    res.json({ success: true, message: "Category deleted" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.json({ message: "Category deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -62,7 +92,8 @@ export const getCategories = async (req, res) => {
   try {
     const categories = await CategoryModel.find().sort({ name: 1 });
     res.json({ success: true, categories });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    res.status(500).json({ error: error.message });
   }
 };
