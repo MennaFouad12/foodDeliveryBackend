@@ -6,6 +6,7 @@ import userRouter from "./routes/userRoute.js";
 import 'dotenv/config.js'
 import cartRouter from "./routes/CartRoute.js";
 import orderRouter from "./routes/orderRoute.js";
+import categoryRoutes from "./routes/categoryRoute.js";
 
 // app config
 const app = express();
@@ -26,7 +27,7 @@ app.get("/", (req, res) => {
   app.use("/api/cart",cartRouter);
   app.use("/api/order",orderRouter);
 
-
+app.use("/api/category", categoryRoutes);
   if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 4000;
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
