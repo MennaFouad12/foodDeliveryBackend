@@ -1,45 +1,125 @@
 
-import FoodModel from "../models/foodemodel.js"
-import fs from "fs" 
+// import FoodModel from "../models/foodemodel.js"
+// import fs from "fs" 
 
 
+// const addFood = async (req, res) => {
+//   try {
+//     let image =`${req.file.filename}`;
+//     const {name, price, description, category} = req.body
+//     const food = await FoodModel.create({
+//       name,
+//       image,
+//       price,
+//       description,
+//       category
+//     })
+//     res.status(200).json({message: "Food added successfully",food})
+//   } catch (error) {
+//     console.log(error)
+//     res.status(500).json({error: error.message})
+//   }
+// }
+// const listFoods = async (req, res) => {
+//   try {
+//     const foods = await FoodModel.find()
+//     res.status(200).json({success: true,data: foods})
+//   } catch (error) {
+//     console.log(error)
+//     res.status(500).json({error: error.message})
+//   }
+// }
+// const removeFood = async (req, res) => {
+//   try {
+//     const {id} = req.params
+//     const food = await FoodModel.findById(id)
+//     fs.unlinkSync(`./uploads/${food.image}`)
+//       await FoodModel.findByIdAndDelete(id)
+//     res.status(200).json({success: true,data: food})
+//   } catch (error) {
+//     console.log(error)
+//     res.status(500).json({error: error.message})
+//   }
+// }
+
+// export {addFood,listFoods,removeFood}
+
+
+
+
+import FoodModel from "../models/foodemodel.js";
+import cloudinary from "../config/cloudinary.js";
+
+// Helper: upload buffer to Cloudinary
+const uploadToCloudinary = (fileBuffer) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "foods" }, // cloudinary folder
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+    stream.end(fileBuffer); // push the buffer into the upload stream
+  });
+};
+
+// ✅ Add food
 const addFood = async (req, res) => {
   try {
-    let image =`${req.file.filename}`;
-    const {name, price, description, category} = req.body
+    const { name, price, description, category } = req.body;
+
+    let imageUrl = null;
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer);
+      imageUrl = result.secure_url;
+    }
+
     const food = await FoodModel.create({
       name,
-      image,
+      image: imageUrl,
       price,
       description,
-      category
-    })
-    res.status(200).json({message: "Food added successfully",food})
+      category,
+    });
+
+    res.status(200).json({ message: "Food added successfully", food });
   } catch (error) {
-    console.log(error)
-    res.status(500).json({error: error.message})
+    console.error(error);
+    res.status(500).json({ error: error.message });
   }
-}
+};
+
+// ✅ List foods
 const listFoods = async (req, res) => {
   try {
-    const foods = await FoodModel.find()
-    res.status(200).json({success: true,data: foods})
+    const foods = await FoodModel.find();
+    res.status(200).json({ success: true, data: foods });
   } catch (error) {
-    console.log(error)
-    res.status(500).json({error: error.message})
+    console.error(error);
+    res.status(500).json({ error: error.message });
   }
-}
+};
+
+// ✅ Remove food
 const removeFood = async (req, res) => {
   try {
-    const {id} = req.params
-    const food = await FoodModel.findById(id)
-    fs.unlinkSync(`./uploads/${food.image}`)
-      await FoodModel.findByIdAndDelete(id)
-    res.status(200).json({success: true,data: food})
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({error: error.message})
-  }
-}
+    const { id } = req.params;
+    const food = await FoodModel.findById(id);
 
-export {addFood,listFoods,removeFood}
+    if (!food) return res.status(404).json({ error: "Food not found" });
+
+    // Extract public_id from the Cloudinary URL
+    const publicId = food.image.split("/").pop().split(".")[0];
+    await cloudinary.uploader.destroy(`foods/${publicId}`);
+
+    await FoodModel.findByIdAndDelete(id);
+
+    res.status(200).json({ success: true, data: food });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export { addFood, listFoods, removeFood };

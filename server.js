@@ -26,6 +26,11 @@ app.get("/", (req, res) => {
   app.use("/api/cart",cartRouter);
   app.use("/api/order",orderRouter);
 
+
+  if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
   
 export default app;
 
