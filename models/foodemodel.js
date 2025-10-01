@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 const foodSchema = new mongoose.Schema({
   name: {
     type: String,
+    unique: true,
     required: true,
   },
   image: {

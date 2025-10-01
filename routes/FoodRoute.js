@@ -26,7 +26,7 @@
 
 import express from "express";
 import multer from "multer";
-import { addFood, getProductsByCategory, listFoods, removeFood } from "../controllers/foodController.js";
+import { addFood, getProductsByCategory, listFoods, removeFood, updateFood } from "../controllers/foodController.js";
 import authMiddleware from "../middleware/auth.js";
 
 const foodRouter = express.Router();
@@ -35,6 +35,8 @@ const foodRouter = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 foodRouter.post("/add",authMiddleware, upload.single("image"), addFood);
+foodRouter.put("/update/:id",authMiddleware, upload.single("image"), updateFood);
+
 foodRouter.get("/list", listFoods);
 foodRouter.delete("/remove/:id",authMiddleware, removeFood);
 foodRouter.get("/category/:categoryName", getProductsByCategory);

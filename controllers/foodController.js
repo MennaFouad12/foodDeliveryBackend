@@ -86,10 +86,46 @@ const addFood = async (req, res) => {
 
     res.status(200).json({ message: "Food added successfully", food });
   } catch (error) {
+    if (error.code === 11000) {
+    return res.status(400).json({ error: "Food name already exists" });
+  }
     console.error(error);
     res.status(500).json({ error: error.message });
   }
 };
+const updateFood = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {  price, description, category } = req.body;
+
+    let updateData = {  price, description, category };
+
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer);
+      updateData.image = result.secure_url;
+    }
+
+    const updatedFood = await FoodModel.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
+
+    if (!updatedFood) return res.status(404).json({ error: "Food not found" });
+
+    res.json({ message: "Food updated successfully", food: updatedFood });
+  } catch (error) {
+    console.error("Error updating food:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+// const getFoodsByCategory = async (req, res) => {
+//     const { category } = req.params;
+  
+//     const foods = await FoodModel.find({ category });
+  
+//     res.json({
+//       success: true,
+//       data: foods,
+//     })
 
 // ✅ List foods
 const listFoods = async (req, res) => {
@@ -150,4 +186,4 @@ const getProductsByCategory = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-export { addFood, listFoods, removeFood,getProductsByCategory };
+export { addFood, listFoods, removeFood,getProductsByCategory,updateFood };
