@@ -27,15 +27,16 @@
 import express from "express";
 import multer from "multer";
 import { addFood, getProductsByCategory, listFoods, removeFood } from "../controllers/foodController.js";
+import authMiddleware from "../middleware/auth.js";
 
 const foodRouter = express.Router();
 
 // Multer with memory storage (keeps file in memory as a Buffer)
 const upload = multer({ storage: multer.memoryStorage() });
 
-foodRouter.post("/add", upload.single("image"), addFood);
+foodRouter.post("/add",authMiddleware, upload.single("image"), addFood);
 foodRouter.get("/list", listFoods);
-foodRouter.delete("/remove/:id", removeFood);
+foodRouter.delete("/remove/:id",authMiddleware, removeFood);
 foodRouter.get("/category/:categoryName", getProductsByCategory);
 
 export default foodRouter; 
