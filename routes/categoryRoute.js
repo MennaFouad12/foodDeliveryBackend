@@ -7,12 +7,13 @@ import {
   getCategories,
 } from "../controllers/categoryController.js";
 import multer from "multer";
+import authMiddleware from "../middleware/auth.js";
 const categoryrouter = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-categoryrouter.post("/add", upload.single("image"), addCategory);
-categoryrouter.put("/update/:id", updateCategory);
-categoryrouter.delete("/delete/:id", deleteCategory);
+categoryrouter.post("/add",authMiddleware ,upload.single("image"), addCategory);
+categoryrouter.put("/update/:id",authMiddleware, updateCategory);
+categoryrouter.delete("/delete/:id",authMiddleware, deleteCategory);
 categoryrouter.get("/list", getCategories);
 
 export default categoryrouter;
