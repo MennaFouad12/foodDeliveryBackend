@@ -10,7 +10,7 @@ const categorySchema = new mongoose.Schema({
   },
   
   image: {
-    type: String, // هتخزن اللينك أو اسم الملف
+    type: String,
     required: true,
   },
 });

@@ -130,13 +130,11 @@ const getProductsByCategory = async (req, res) => {
   try {
     const { categoryName } = req.params;
 
-    // اتأكد الأول إن الكاتيجوري موجود
     const category = await CategoryModel.findOne({ name: categoryName });
     if (!category) {
       return res.status(404).json({ success: false, message: "Category not found" });
     }
 
-    // هات كل الأكل اللي تبع الكاتيجوري ده
     const foods = await FoodModel.find({ category: categoryName });
 
     res.status(200).json({
