@@ -1,44 +1,78 @@
-
 // import express from "express";
-// //  import { addFood } from "../controllers/foodController";
-//  import multer from "multer";
-// import { addFood, listFoods,removeFood } from "../controllers/foodController.js";
-//  const foodRouter = express.Router();
-// //image storage Engine
-// const storage = multer.diskStorage({
-//   destination: "uploads",
-//     filename: function (req, file, cb) {
-//     cb(null,`${Date.now()}-${file.originalname}`);
-//   },
-// });
+// import multer from "multer";
+// <<<<<<< HEAD
+// import { addFood, getProductsByCategory, listFoods, removeFood, updateFood } from "../controllers/foodController.js";
+// import authMiddleware from "../middleware/auth.js";
+// =======
+// import { addFood, getProductsByCategory, listFoods, removeFood } from "../controllers/foodController.js";
+// import { authenticate, authorizeRoles } from "../middleware/auth.js"; 
+// >>>>>>> marwan
 
-// const upload = multer({ storage: storage });
+// const foodRouter = express.Router();
+
+// const upload = multer({ storage: multer.memoryStorage() });
+
+// <<<<<<< HEAD
+// foodRouter.post("/add",authMiddleware, upload.single("image"), addFood);
+// foodRouter.put("/update/:id",authMiddleware, upload.single("image"), updateFood);
+
+// foodRouter.get("/list", listFoods);
+// foodRouter.delete("/remove/:id",authMiddleware, removeFood);
+// =======
+// // Admin Routes (Protected)
+// foodRouter.post("/add", authenticate, authorizeRoles('admin'), upload.single("image"), addFood);
+// foodRouter.delete("/remove/:id", authenticate, authorizeRoles('admin'), removeFood);
+
+// // Public Routes
+// foodRouter.get("/list", listFoods);
+// >>>>>>> marwan
+// foodRouter.get("/category/:categoryName", getProductsByCategory);
+
+// export default foodRouter;
 
 
 
 
 
-// foodRouter.post("/add",upload.single("image"),addFood)
-// foodRouter.get("/list",listFoods)
-// foodRouter.post("/remove/:id",removeFood)
-//  export default foodRouter;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 import express from "express";
 import multer from "multer";
-import { addFood, getProductsByCategory, listFoods, removeFood, updateFood } from "../controllers/foodController.js";
-import authMiddleware from "../middleware/auth.js";
+import { 
+  addFood, 
+  getProductsByCategory, 
+  listFoods, 
+  removeFood, 
+  updateFood 
+} from "../controllers/foodController.js";
+import { authenticate, authorizeRoles } from "../middleware/auth.js";
 
 const foodRouter = express.Router();
 
-// Multer with memory storage (keeps file in memory as a Buffer)
 const upload = multer({ storage: multer.memoryStorage() });
 
-foodRouter.post("/add",authMiddleware, upload.single("image"), addFood);
-foodRouter.put("/update/:id",authMiddleware, upload.single("image"), updateFood);
+// ✅ Admin Routes (Protected)
+foodRouter.post("/add", authenticate, authorizeRoles("admin"), upload.single("image"), addFood);
+foodRouter.put("/update/:id", authenticate, authorizeRoles("admin"), upload.single("image"), updateFood);
+foodRouter.delete("/remove/:id", authenticate, authorizeRoles("admin"), removeFood);
 
+// ✅ Public Routes
 foodRouter.get("/list", listFoods);
-foodRouter.delete("/remove/:id",authMiddleware, removeFood);
 foodRouter.get("/category/:categoryName", getProductsByCategory);
 
-export default foodRouter; 
+export default foodRouter;
