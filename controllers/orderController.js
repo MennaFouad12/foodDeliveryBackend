@@ -12,18 +12,18 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2024-06-20", // latest supported
 });
 const placeOrder=async(req,res)=>{
-const frontendUrl="http://localhost:5173";
+const frontendUrl="https://food-delivery-frontend-sigma-ebon.vercel.app";
   try {
     // const {token,amount}=req.body;
     const newOrder=await OrderModel.create({
-      userId:req.user._id,
+      userId:req.user.id,
       items:req.body.items,
       amount:req.body.amount,
       address:req.body.address,
       status:"Food Processing"
     })
     await newOrder.save();
-    await User.findOneAndUpdate({_id:req.user._id},{cartData:{}});
+    await User.findOneAndUpdate({_id:req.user.id},{cartData:{}});
   const line_items=req.body.items.map((item)=>({
     price_data: {
       currency: "inr",
