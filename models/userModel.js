@@ -50,7 +50,8 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
   
-    cartData: { type: Object, default: {} },
+    cartData: { type: Object, 
+      default: {} },
   },
   { minimize: false } // ✅ put schema options here
 );
