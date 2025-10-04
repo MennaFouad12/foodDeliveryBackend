@@ -18,24 +18,48 @@ const uploadToCloudinary = (fileBuffer) => {
 };
 
 // ✅ Add Category
+// export const addCategory = async (req, res) => {
+//   try {
+//     const { name } = req.body;
+
+//     if (!name) return res.status(400).json({ error: "Name is required" });
+
+//     const exists = await CategoryModel.findOne({ name });
+//     if (exists) return res.status(400).json({ error: "Category already exists" });
+
+//     let imageUrl = null;
+//     if (req.file) {
+//       const result = await uploadToCloudinary(req.file.buffer);
+//       imageUrl = result.secure_url;
+//     }
+
+//     const category = await CategoryModel.create({
+//       name,
+//       image: imageUrl,
+//     });
+
+//     res.status(201).json({ message: "Category added successfully", category });
+//   } catch (error) {
+//     console.error("Error adding category:", error);
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
 export const addCategory = async (req, res) => {
   try {
     const { name } = req.body;
 
     if (!name) return res.status(400).json({ error: "Name is required" });
+    if (!req.file) return res.status(400).json({ error: "Image is required" });
 
     const exists = await CategoryModel.findOne({ name });
     if (exists) return res.status(400).json({ error: "Category already exists" });
 
-    let imageUrl = null;
-    if (req.file) {
-      const result = await uploadToCloudinary(req.file.buffer);
-      imageUrl = result.secure_url;
-    }
+    const result = await uploadToCloudinary(req.file.buffer);
 
     const category = await CategoryModel.create({
       name,
-      image: imageUrl,
+      image: result.secure_url,
     });
 
     res.status(201).json({ message: "Category added successfully", category });
@@ -44,6 +68,7 @@ export const addCategory = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 // ✅ Update Category
 export const updateCategory = async (req, res) => {
