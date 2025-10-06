@@ -13,7 +13,7 @@ const categoryrouter = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 categoryrouter.post("/add",authenticate ,upload.single("image"), addCategory);
-categoryrouter.put("/update/:id",authenticate, updateCategory);
+categoryrouter.put("/update/:id",authenticate, upload.single("image"), updateCategory);
 categoryrouter.delete("/delete/:id",authenticate, deleteCategory);
 categoryrouter.get("/list", getCategories);
 

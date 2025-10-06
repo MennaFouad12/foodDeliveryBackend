@@ -113,12 +113,40 @@ export const deleteCategory = async (req, res) => {
 };
 
 // ✅ Get All Categories
+// export const getCategories = async (req, res) => {
+//   try {
+//     const categories = await CategoryModel.find().sort({ name: 1 });
+//     res.json({ success: true, categories });
+//   } catch (error) {
+//     console.error("Error fetching categories:", error);
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
 export const getCategories = async (req, res) => {
   try {
-    const categories = await CategoryModel.find().sort({ name: 1 });
+    const categories = await CategoryModel.aggregate([
+      {
+        $lookup: {
+          from: "foods", // collection name in MongoDB (lowercase + plural)
+          localField: "name",
+          foreignField: "category",
+          as: "foods",
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          image: 1,
+          productCount: { $size: "$foods" },
+        },
+      },
+      { $sort: { name: 1 } },
+    ]);
+
     res.json({ success: true, categories });
   } catch (error) {
     console.error("Error fetching categories:", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
