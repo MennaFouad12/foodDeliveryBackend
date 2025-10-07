@@ -138,6 +138,16 @@ const listFoods = async (req, res) => {
   }
 };
 
+const getSingleFood = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const food = await FoodModel.findById(id);
+    res.status(200).json({ success: true, data: food });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+}
 // ✅ Remove food
 const removeFood = async (req, res) => {
   try {
@@ -184,4 +194,4 @@ const getProductsByCategory = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-export { addFood, listFoods, removeFood,getProductsByCategory,updateFood };
+export { addFood, listFoods,getSingleFood,removeFood,getProductsByCategory,updateFood };

@@ -56,6 +56,7 @@ import multer from "multer";
 import { 
   addFood, 
   getProductsByCategory, 
+  getSingleFood, 
   listFoods, 
   removeFood, 
   updateFood 
@@ -73,6 +74,7 @@ foodRouter.delete("/remove/:id", authenticate, authorizeRoles("admin"), removeFo
 
 // ✅ Public Routes
 foodRouter.get("/list", listFoods);
+foodRouter.get("/single/:id", getSingleFood);
 foodRouter.get("/category/:categoryName", getProductsByCategory);
 
 export default foodRouter;
