@@ -60,4 +60,18 @@ const frontendUrl="https://food-delivery-frontend-sigma-ebon.vercel.app";
     res.status(500).json({error:error.message});
   }
 }
-export {placeOrder};
+
+
+const getAllOrders=async(req,res)=>{
+  try {
+    const orders=await OrderModel.find();
+    res.status(200).json({success:true,data:orders});
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({error:error.message});
+  }
+}
+
+
+
+export {placeOrder,getAllOrders};
