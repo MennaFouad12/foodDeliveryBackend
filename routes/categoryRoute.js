@@ -5,6 +5,7 @@ import {
   updateCategory,
   deleteCategory,
   getCategories,
+  getCategory,
 } from "../controllers/categoryController.js";
 import multer from "multer";
 import { authenticate, authorizeRoles } from "../middleware/auth.js";
@@ -16,5 +17,6 @@ categoryrouter.post("/add",authenticate,authorizeRoles("admin") ,upload.single("
 categoryrouter.put("/update/:id",authenticate,authorizeRoles("admin"), upload.single("image"), updateCategory);
 categoryrouter.delete("/delete/:id",authenticate,authorizeRoles("admin"), deleteCategory);
 categoryrouter.get("/list", getCategories);
+categoryrouter.get("/:id", getCategory);
 
 export default categoryrouter;
