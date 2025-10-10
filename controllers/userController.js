@@ -71,9 +71,6 @@ export const register = async (req, res) => {
       success: true,
       user: {
         id: newUser._id,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role
       }
     });
   } catch (error) {
