@@ -80,10 +80,7 @@ export const register = async (req, res) => {
       message: "User registered successfully",
       success: true,
       user: {
-        id: newUser._id,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role,
+        id: newUser._id
       },
     });
   } catch (error) {
